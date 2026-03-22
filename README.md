@@ -2,19 +2,19 @@
 
 DeepGuard AI is a React + Vite web app for analyzing images and videos with modern vision-capable LLMs through OpenRouter. It provides a polished forensic-style interface for uploading media, running AI-assisted authenticity checks, and reviewing structured detection results.
 
-## Features
+## ✨ Features
 
-- Image and video upload with preview support
-- AI-powered media analysis through OpenRouter
-- Switchable vision models in the Settings page
+- 📤 Upload images & videos with preview
+- 🤖 AI-powered media analysis (OpenRouter)
+- 🔄 Switch between multiple vision models
 - Supported models:
   - `google/gemini-2.5-pro`
   - `openai/gpt-4o`
   - `openai/gpt-4.1`
-- Detection history stored locally in the browser
-- Configurable analysis settings and model selection
+- 🕘 Local detection history
+- ⚙️ Customizable analysis settings
 
-## Tech Stack
+## 🧰 Tech Stack
 
 - React 19
 - TypeScript
@@ -24,20 +24,21 @@ DeepGuard AI is a React + Vite web app for analyzing images and videos with mode
 - Lucide React
 - Motion
 
-## Getting Started
+## 🚀 Getting Started
 
-### Prerequisites
+### ✒️ Prerequisites
 
 - Node.js 18+ recommended
 - An OpenRouter API key
 
-### Installation
+
+### 📦 Installation
 
 ```bash
 npm install
 ```
 
-### Environment Setup
+### 🔑 Environment Setup
 
 Create a local `.env` file or update the existing one:
 
@@ -49,7 +50,7 @@ APP_URL="http://localhost:3000"
 
 You can also copy values from [`.env.example`](.env.example).
 
-## Running Locally
+## ▶️ Running Locally
 
 ```bash
 npm run dev
@@ -57,7 +58,7 @@ npm run dev
 
 The app will start on `http://localhost:3000`.
 
-## Available Scripts
+## 📜 Available Scripts
 
 ```bash
 npm run dev
@@ -66,7 +67,7 @@ npm run preview
 npm run lint
 ```
 
-## How It Works
+## ⚙️ How It Works
 
 1. Upload an image or video.
 2. The app converts the file into a data URL in the browser.
@@ -74,7 +75,7 @@ npm run lint
 4. The model returns a structured verdict with confidence, reasoning, and detected artifacts.
 5. Results can be reviewed in the UI and saved to local history.
 
-## Project Structure
+## 📁 Project Structure
 
 ```text
 src/
@@ -83,19 +84,23 @@ src/
   index.css      Global styles
 ```
 
-## Important Security Note
+## ⚠️ Important Security Note
 
-This project currently sends OpenRouter requests directly from the frontend. That means your API key is exposed to the browser at runtime.
+⚠️ This project currently sends OpenRouter requests directly from the frontend. That means your API key is exposed to the browser at runtime.
 
-For production use, move the OpenRouter request to a backend or serverless API route and keep the API key server-side.
+👉 For production use, move the OpenRouter request to a backend or serverless API route and keep the API key server-side.
 
-## Future Improvements
+## 🔮 Future Improvements
 
 - Add a backend proxy for secure API usage
 - Add stronger result validation and structured output parsing
 - Add export formats beyond plain text reports
 - Add automated tests for analysis and settings flows
 
-## License
+## 📄 License
 
 This project is provided as-is for educational and development use.
+
+---
+
+## Made with ❤️ & AI...
