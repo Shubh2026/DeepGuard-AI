@@ -32,6 +32,9 @@ const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY || '';
 const DEFAULT_OPENROUTER_MODEL = process.env.OPENROUTER_MODEL || 'google/gemini-2.5-pro';
 const APP_URL = process.env.APP_URL || 'http://localhost:3000';
 const APP_TITLE = 'DeepGuard';
+const DEFAULT_MAX_TOKENS = 800;
+const MIN_MAX_TOKENS = 250;
+const TOKEN_SAFETY_BUFFER = 32;
 
 const MODEL_OPTIONS = [
   {
@@ -87,6 +90,18 @@ const extractResponseText = (content?: OpenRouterMessageContent): string => {
     .map((part) => ('text' in part ? part.text : ''))
     .filter(Boolean)
     .join('\n');
+};
+
+const extractAffordableTokenLimit = (message?: string): number | null => {
+  if (!message) return null;
+
+  const match = message.match(/can only afford (\d+)/i);
+  if (!match) return null;
+
+  const affordableTokens = Number(match[1]);
+  if (!Number.isFinite(affordableTokens)) return null;
+
+  return Math.max(MIN_MAX_TOKENS, affordableTokens - TOKEN_SAFETY_BUFFER);
 };
 
 type DetectionResult = {
@@ -261,6 +276,7 @@ export default function App() {
     let retries = 0;
     const maxRetries = 3;
     const baseDelay = 4000;
+    let requestedMaxTokens = DEFAULT_MAX_TOKENS;
 
     while (retries <= maxRetries) {
       try {
@@ -300,7 +316,7 @@ export default function App() {
           },
           body: JSON.stringify({
             model: selectedModel,
-            max_tokens: 800,
+            max_tokens: requestedMaxTokens,
             messages: [
               {
                 role: 'user',
@@ -353,6 +369,23 @@ export default function App() {
           err.status === 429 ||
           err.message?.toLowerCase().includes('quota') ||
           err.message?.toLowerCase().includes('rate limit');
+        const affordableTokenLimit = extractAffordableTokenLimit(err.message);
+        const isCreditLimit =
+          err.message?.toLowerCase().includes('more credits') ||
+          err.message?.toLowerCase().includes('fewer max_tokens') ||
+          err.message?.toLowerCase().includes('can only afford');
+
+        if (
+          isCreditLimit &&
+          affordableTokenLimit &&
+          affordableTokenLimit < requestedMaxTokens
+        ) {
+          requestedMaxTokens = affordableTokenLimit;
+          setRetryStatus(`Credit limit detected. Retrying with a smaller response budget (${requestedMaxTokens} tokens)...`);
+          await sleep(1200);
+          setRetryStatus(null);
+          continue;
+        }
 
         if (isRateLimit && retries < maxRetries) {
           retries++;
@@ -366,6 +399,8 @@ export default function App() {
 
         if (isRateLimit) {
           setError("The AI service is currently at maximum capacity. Please try again in 1-2 minutes.");
+        } else if (isCreditLimit) {
+          setError("Your OpenRouter balance is too low for the current request. Add credits, or try again after lowering the response token budget.");
         } else {
           setError(err.message || "An error occurred during analysis.");
         }
